@@ -1,0 +1,84 @@
+SIP CONFIGURATION
+conf t
+ voice service voip
+  allow-connections h323 to sip
+  allow-connections sip to h323
+  allow-connections sip to sip
+  supplementary-service h450.12
+ sip
+   bind control source-interface fa 0/0
+   bind media source-interface fa 0/0
+   registrar server expires max 600 min 60
+!
+ voice register global
+  mode cme
+  source-address 10.12.100.8 port 5060
+  max-dn 12
+  max-pool 12
+  authenticate register
+  create profile sync
+ voice register dn 1
+   number 12698
+   allow watch
+   name iphone
+ voice register dn 2    
+   number 12777
+   allow watch
+   name samsung
+  voice register pool 1
+    id mac b878.c545.8990
+    number 1 dn 1
+    dtmf-relay sip-notify
+    username 12698 password 12698
+    codec g711ulaw
+!
+  voice register pool 2
+    id mac 749e.af1f.4f2f
+    number 1 dn 2
+    dtmf-relay sip-notify
+    username 12777 password 12777
+    codec g711ulaw
+!
+*******call other countries!!!********
+config t
+!
+dial-peer voice _ voip
+destination-pattern k..
+session protocol sipv2
+          
+session target sip-server
+codec g711ulaw
+exit
+sip-ua
+sip-server ipv4:192.168.k.1
+
+
+
+-------------------------
+AP:
+
+conf t
+dot11 ssid sipwifi12
+ authentication open
+ authentication key-management wpa
+ wpa-psk ascii aaabbb123
+ guest-mode
+
+ int dot11radio 0
+ no shut
+ encryption mode ciphers tkip
+ ssid sipwifi12
+ do sh ip int br
+
+
+
+ ------------------------
+
+
+
+ LINPHONE APP
+ 
+ username: 12698
+ password: 12698
+ domain: 10.12.100.8
+ display: 12698
